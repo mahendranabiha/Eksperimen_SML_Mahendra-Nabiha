@@ -1,0 +1,41 @@
+# Name of the workflow
+name: Automated Eksperimen_SML_Mahendra-Nabiha Repository
+
+# Events that trigger workflow
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+# Define jobs and runners
+jobs:
+  preprocessing:
+    runs-on: ubuntu-latest
+
+  # Define steps
+    steps: 
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12.7
+      
+      - name: Install packages
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas scikit-learn
+      
+      - name: Run python preprocessing script
+        run: |
+          python preprocessing/automate_Mahendra-Nabiha.py
+      
+      - name: Commit to update preprocessed dataset
+        run: |
+          git config --global user.name ${{ secrets.USERNAME }}
+          git config --global user.email ${{ secrets.EMAIL }}
+          git add preprocessing/weather_preprocessing/X_train.csv preprocessing/weather_preprocessing/X_test.csv preprocessing/weather_preprocessing/y_train.csv preprocessing/weather_preprocessing/y_test.csv
+          git commit -m "Update dataset successfully" || echo "Update dataset not successfully"
+          git push
